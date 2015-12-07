@@ -34,6 +34,7 @@ persist.radio.apn_delay=5000
 persist.radio.mot_ecc_enabled=1
 persist.radio.mot_ecc_custid=common
 keyguard.no_require_sim=true
+persist.radio.data_no_toggle=1
 persist.radio.RATE_ADAPT_ENABLE=1
 persist.radio.REVERSE_QMI=0
 persist.radio.ROTATION_ENABLE=1
