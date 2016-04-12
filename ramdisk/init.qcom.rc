@@ -52,7 +52,6 @@ on init
     # mkdir /oem 0550 root root
 
     # Support legacy paths
-    symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
 
     mount pstore pstore /sys/fs/pstore
