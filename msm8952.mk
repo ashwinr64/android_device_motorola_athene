@@ -75,8 +75,8 @@ PRODUCT_COPY_FILES +=  \
     $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf
 
 # Browser
-PRODUCT_PACKAGES += \
-    Gello
+#PRODUCT_PACKAGES += \
+#    Gello
 
 # Camera
 PRODUCT_PACKAGES += \
@@ -85,8 +85,8 @@ PRODUCT_PACKAGES += \
     Snap
 
 # CMActions
-PRODUCT_PACKAGES += \
-    CMActions
+#PRODUCT_PACKAGES += \
+#    CMActions
 
 # Display
 PRODUCT_PACKAGES += \
