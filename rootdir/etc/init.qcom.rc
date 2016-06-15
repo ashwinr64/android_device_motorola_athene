@@ -29,20 +29,31 @@ import init.mmi.usb.rc
 import init.target.rc
 
 on early-init
-    chown system graphics /sys/devices/virtual/graphics/fb0/idle_time
+    # Create firmware mount point
+    mkdir /firmware 0771 system system
 
     mkdir /system 0777 root root
 
-    # Create firmware mount point
-    mkdir /firmware 0771 system system
+    symlink /data/tombstones /tombstones
+
+    # DSP
+    mkdir /dsp 0771 media media
 
     # Create modem FSG mount point
     mkdir /fsg 755 root root
 
-    chown system system /sys/kernel/debug
-    chmod 0775 /sys/kernel/debug
+    ##TEMP Remove - Ashwin
+    # boot with max freq, will be reset in post_boot script
+    # write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 1209600
 
-    symlink /data/tombstones /tombstones
+    # Mount point for Digital Personalization partition
+    mkdir /customize 0500 root root
+
+    # Subsytem Restart
+    #lpass
+    write /sys/bus/msm_subsys/devices/subsys1/restart_level "related"
+    write /sys/bus/msm_subsys/devices/subsys1/recovery_policy "skip_restart"
+
 
 on init
     # Set permissions for persist partition
@@ -50,65 +61,78 @@ on init
 
     # Support legacy paths
     symlink /sdcard /mnt/sdcard
+    symlink /sdcard /storage/sdcard0
+	
+write /sys/module/qpnp_rtc/parameters/poweron_alarm 1
 
-    # Configure coredump
-    write /proc/sys/kernel/core_pattern "|/system/bin/coredump %e %p %t"
-    write /proc/self/coredump_filter "0x7f"
+# Allow usb charging to be disabled peristently
+on property:persist.usb.chgdisabled=1
+    write /sys/class/power_supply/battery/charging_enabled 0
+
+on property:persist.usb.chgdisabled=0
+    write /sys/class/power_supply/battery/charging_enabled 1
+	
+    mount pstore pstore /sys/fs/pstore
+    chown system log /sys/fs/pstore/console-ramoops-0
+    chmod 0440 /sys/fs/pstore/console-ramoops-0
+    chown system log /sys/fs/pstore/annotate-ramoops-0
+    chmod 0640 /sys/fs/pstore/annotate-ramoops-0
+    chown system log /sys/fs/pstore/dmesg-ramoops-0
+    chmod 0640 /sys/fs/pstore/dmesg-ramoops-0
+
+    copy /module_hashes /sys/kernel/module_whitelist
 
     # Setup kernel dropbox permissions so that dropboxd can utilize it
     chown root diag /sys/kernel/dropbox/event
     chown root diag /sys/kernel/dropbox/data
 
-    mount pstore pstore /sys/fs/pstore
-    chown system log /sys/fs/pstore/console-ramoops
-    chmod 0440 /sys/fs/pstore/console-ramoops
-    chown system log /sys/fs/pstore/annotate-ramoops
-    chmod 0640 /sys/fs/pstore/annotate-ramoops
+    # Configure coredump
+    write /proc/sys/kernel/core_pattern "|/system/bin/coredump %e %p %t"
+    write /proc/self/coredump_filter "0x7f"
 
-    # ESDFS
+    #ESDFS
     chown mot_esdfs root /proc/fs/esdfs/packages
-
-    # Full speed for bootup
-    write /sys/devices/system/cpu/cpu1/online 1
-    write /sys/devices/system/cpu/cpu2/online 1
-    write /sys/devices/system/cpu/cpu3/online 1
-    write /sys/module/msm_thermal/core_control/enabled 0
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "performance"
-    write /sys/module/msm_thermal/core_control/enabled 1
-    write /sys/class/devfreq/1c00000.qcom,kgsl-3d0/governor "performance"
-    write /sys/class/devfreq/qcom,cpubw.30/governor "performance"
 
 on fs
     mount_all fstab.qcom
 
-    # set up a symbolic link so the many references to the old location still work and the java code can remain platform agnostic.
-    symlink /dev/block/bootdevice /dev/block/platform/msm_sdcc.1
+	## Move to fstab - Ashwin
+    #Mount customize partion
+    wait /dev/block/bootdevice/by-name/customize
+    mount ext4 /dev/block/bootdevice/by-name/customize /customize ro discard nosuid nodev noatime nodiratime noexec defcontext=u:object_r:user_config_file:s0
+
+	mkdir /persist/data 0700  system system
+    restorecon_recursive /persist
+
+    restorecon_recursive /dsp
 
     # use /persist as phony PDS partition
     symlink /persist /pds
 
-    mkdir /persist/data 0700  system system
-    restorecon_recursive /persist
-
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
+    write /sys/block/dm-0/queue/read_ahead_kb 2048
     write /sys/kernel/boot_adsp/boot 1
+    chown root audio /sys/kernel/boot_adsp/boot
 
 on boot
     chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/type
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /proc/bluetooth/sleep/proto
     chown bluetooth bluetooth /sys/module/hci_uart/parameters/ath_lpm
     chown bluetooth bluetooth /sys/module/hci_uart/parameters/ath_btwrite
     chown system system /sys/module/sco/parameters/disable_esco
+    chown system system /sys/class/leds/red/blink
     chown bluetooth bluetooth /sys/module/hci_smd/parameters/hcismd_set
+    chown system system /sys/module/radio_iris_transport/parameters/fmsmd_set
     chmod 0660 /sys/module/bluetooth_power/parameters/power
     chmod 0660 /sys/module/hci_smd/parameters/hcismd_set
+    chmod 0660 /sys/module/radio_iris_transport/parameters/fmsmd_set
     chmod 0660 /sys/class/rfkill/rfkill0/state
     chmod 0660 /proc/bluetooth/sleep/proto
-    chown bluetooth bluetooth /dev/ttyHS0
+    chown bluetooth net_bt /dev/ttyHS0
     chmod 0660 /sys/module/hci_uart/parameters/ath_lpm
     chmod 0660 /sys/module/hci_uart/parameters/ath_btwrite
     chmod 0660 /dev/ttyHS0
@@ -118,7 +142,7 @@ on boot
     chmod 0660 /dev/ttyHS2
     chown bluetooth bluetooth /dev/ttyHS2
 
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/device/extldo
+    chown bluetooth net_bt /sys/class/rfkill/rfkill0/device/extldo
     chmod 0660 /sys/class/rfkill/rfkill0/device/extldo
 
     #Create QMUX deamon socket area
@@ -131,25 +155,41 @@ on boot
     mkdir /dev/socket/qmux_gps 0770 gps gps
     chmod 2770 /dev/socket/qmux_gps
 
-    # Create NETMGR daemon socket area
+    mkdir /persist/drm 0770 system system
+
+    #Create NETMGR daemon socket area
     mkdir /dev/socket/netmgr 0750 radio radio
-
-    # Prevents permission denied error for telephony
-    chmod 0644 /proc/cmdline
-
-    mkdir /persist/bluetooth 0770 bluetooth bluetooth
 
     setprop wifi.interface wlan0
 
+#   Define TCP buffer sizes for various networks
+#   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
+    setprop net.tcp.buffersize.wifi    524288,2097152,4194304,262144,524288,1048576
+
     setprop ro.telephony.call_ring.multiple false
+
+    #Remove SUID bit for iproute2 ip tool
+    chmod 0755 /system/bin/ip
 
     chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
 
-    #For bridgemgr daemon to inform the USB driver of the correct transport
-    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
+#   Define TCP buffer sizes for various networks
+#   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
+    setprop net.tcp.buffersize.default 4096,87380,524288,4096,16384,110208
+    setprop net.tcp.buffersize.lte     2097152,4194304,8388608,262144,524288,1048576
+    setprop net.tcp.buffersize.umts    4094,87380,110208,4096,16384,110208
+    setprop net.tcp.buffersize.hspa    4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hsupa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hsdpa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hspap   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.edge    4093,26280,35040,4096,16384,35040
+    setprop net.tcp.buffersize.gprs    4092,8760,11680,4096,8760,11680
+    setprop net.tcp.buffersize.evdo    4094,87380,524288,4096,16384,262144
 
-    # Assign TCP buffer thresholds to be ceiling value of technology maximums
-    # Increased technology maximums should be reflected here.
+    setprop net.tcp.2g_init_rwnd 10
+
+#   Assign TCP buffer thresholds to be ceiling value of technology maximums
+#   Increased technology maximums should be reflected here.
     write /proc/sys/net/core/rmem_max  8388608
     write /proc/sys/net/core/wmem_max  8388608
 
@@ -183,11 +223,18 @@ on boot
     # an ack packet comes out of order
     write /proc/sys/net/netfilter/nf_conntrack_tcp_be_liberal 1
 
+    # Set the console loglevel to < KERN_INFO
+    # Set the default message loglevel to KERN_INFO
+    write /proc/sys/kernel/printk "6 6 1 7"
+
     # Allow access for CCID command/response timeout configuration
     chown system system /sys/module/ccid_bridge/parameters/bulk_msg_timeout
 
-    # When GPU woken by touch events, keep it on until first app render
-    write /sys/class/kgsl/kgsl-3d0/wake_timeout 250
+    # Mark the copy complete flag to not completed
+    write /data/misc/radio/copy_complete 0
+    chown radio radio /data/misc/radio/copy_complete
+    chmod 0660 /data/misc/radio/copy_complete
+
 
     # File flags for prebuilt ril db file
     write /data/misc/radio/prebuilt_db_support 1
@@ -197,92 +244,91 @@ on boot
     chown radio radio /data/misc/radio/db_check_done
     chmod 0660 /data/misc/radio/db_check_done
 
+# msm specific files that need to be created on /data
+
     start rmt_storage
-
+# Access permission for secure touch
+    chmod 0660 /sys/devices/soc.0/78b7000.i2c/i2c-3/3-0020/input/input0/secure_touch_enable
+    chmod 0440 /sys/devices/soc.0/78b7000.i2c/i2c-3/3-0020/input/input0/secure_touch
+    chmod 0660 /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch_enable
+    chmod 0440 /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch
+    chown system drmrpc /sys/devices/soc.0/78b7000.i2c/i2c-3/3-0020/input/input0/secure_touch_enable
+    chown system drmrpc /sys/devices/soc.0/78b7000.i2c/i2c-3/3-0020/input/input0/secure_touch
+    chown system drmrpc /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch_enable
+    chown system drmrpc /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch
+    write /proc/sys/kernel/sched_boost 1
+	
+    # STML0XX driver parameter permissions
+    chown root mot_tcmd /sys/module/stml0xx/parameters/irq_disable
+    chmod 0660 /sys/module/stml0xx/parameters/irq_disable
+	
     # Change ownership and permission for vibrator
-    chown system system /sys/class/timed_output/vibrator/vtg_level
-    chown system system /sys/class/timed_output/vibrator/vtg_level_default
-    chown system system /sys/class/timed_output/vibrator/vtg_max
-    chown system system /sys/class/timed_output/vibrator/vtg_min
-    chmod 0644 /sys/class/timed_output/vibrator/vtg_level
-    chmod 0644 /sys/class/timed_output/vibrator/vtg_level_default
-    chmod 0644 /sys/class/timed_output/vibrator/vtg_max
-    chmod 0644 /sys/class/timed_output/vibrator/vtg_min
+    chown system system /sys/class/timed_output/vibrator/enable
+    chmod 0660 /sys/class/timed_output/vibrator/enable
 
-    # set permission for Dynamic-CABC feature
-    chown system system /sys/class/graphics/fb0/cabc_mode
-
-    # Create directory used by display clients
-    mkdir /data/misc/display 0770 system graphics
-    mkdir /persist/display 0770 system graphics
-
-    # Graphics node permissions
-    chmod 0664 /sys/class/graphics/fb0/dyn_pu
-    chmod 0664 /sys/class/graphics/fb0/dynamic_fps
-    chmod 0664 /sys/class/graphics/fb0/idle_time
-    chmod 0664 /sys/class/graphics/fb0/mode
-    chmod 0664 /sys/class/graphics/fb0/modes
-
-    chown system graphics /sys/class/graphics/fb0/dyn_pu
-    chown system graphics /sys/class/graphics/fb0/dynamic_fps
-    chown system graphics /sys/class/graphics/fb0/idle_time
-    chown system graphics /sys/class/graphics/fb0/mode
-    chown system graphics /sys/class/graphics/fb0/modes
-
-    # Change ownership and permission for backlight
-    chown system system /sys/class/backlight/lcd-backlight:0/brightness
-    chmod 0664 /sys/class/backlight/lcd-backlight:0/brightness
-    chown system system /sys/class/backlight/lcd-backlight:0/max_brightness
-    chmod 0664 /sys/class/backlight/lcd-backlight:0/max_brightness
-    chmod 0664 /sys/class/leds/lcd-backlight/brightness
+    # Change ownership and permission for laser_sensor
+    chown system system /sys/kernel/range/enable_sar
+    chmod 0660 /sys/kernel/range/enable_sar
+    chown system system /sys/kernel/range/set_delay_ms
+    chmod 0660 /sys/kernel/range/set_delay_ms
+    chown system system /sys/kernel/range/near
+    chmod 0660 /sys/kernel/range/near
 
     # Change the ownership of the notification LED interface
     chown system system /sys/class/leds/rgb/control
     chmod 0664 /sys/class/leds/rgb/control
 
-    # Change the ownership of the charging LED interface
-    chown system system /sys/class/leds/charging/brightness
-    chmod 0664 /sys/class/leds/charging/brightness
-    chown system system /sys/class/leds/charging/trigger
-    chmod 0664 /sys/class/leds/charging/trigger
-
     # Change the ownership of the OneWire bus interface
     chown camera camera /sys/devices/w1_bus_master1/w1_master_search
     chmod 0664 /sys/devices/w1_bus_master1/w1_master_search
 
-    # create the necessary data dirs for tpapi with proper permission
-    mkdir /dev/tpapi 02770 mot_tpapi mot_tpapi
-    mkdir /data/tpapi 02770 mot_tpapi mot_tpapi
-    mkdir /data/tpapi/etc 02770 mot_tpapi mot_tpapi
-    mkdir /data/tpapi/etc/tpa 02770 mot_tpapi mot_tpapi
-    mkdir /data/tpapi/etc/tpa/persistent 02770 mot_tpapi mot_tpapi
+    # Change the ownership of the charging LED interface
+    chown system system /sys/class/leds/charging/brightness
+    chmod 0664 /sys/class/leds/charging/brightness
+
+    # Change permission for backlight
+    chmod 0664 /sys/class/leds/lcd-backlight/brightness
+
+    # set permission for Dynamic-CABC feature
+    chown system system /sys/class/graphics/fb0/cabc_mode
+    # set permission for HBM feature
+    chown system system /sys/class/graphics/fb0/hbm
+
+    # Assign TCP buffer thresholds to be ceiling value of technology maximums
+    # Increased technology maximums should be reflected here.
+    write /proc/sys/net/core/rmem_max  8388608
+    write /proc/sys/net/core/wmem_max  8388608
 
     # Quiet binder logs
     write /sys/module/binder/parameters/debug_mask 0x5
-
-    # STML0XX driver parameter permissions
-    chown root mot_tcmd /sys/module/stml0xx/parameters/irq_disable
-    chmod 0660 /sys/module/stml0xx/parameters/irq_disable
-
-    # charging driver parameter permissions
-    chown root mot_tcmd /sys/module/fan5404x_charger/parameters/factory_kill_disable
-    chmod 0660 /sys/module/fan5404x_charger/parameters/factory_kill_disable
 
     # usb driver parameter permissions
     chown root mot_tcmd /sys/module/phy_msm_usb/parameters/host_mode_disable
     chmod 0660 /sys/module/phy_msm_usb/parameters/host_mode_disable
 
+    # FPC device parameter permissions
+    chown system mot_tcmd /sys/bus/spi/devices/spi7.0/nav
+    chown system mot_tcmd /sys/bus/spi/devices/spi7.0/clk_enable
+    chown system mot_tcmd /sys/bus/spi/devices/spi7.0/dev_enable
+    chown system mot_tcmd /sys/bus/spi/devices/spi7.0/irq
+
     # Create moodle directory that MOT_MOODLE can write to
     mkdir /data/local/moodle 0770 graphics mot_tcmd
 
+    # Firmware Update [MPJ24.139-23.1]
+    write /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/fw_name PR1702898-s3528t_00260005_00380008.img
+    write /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/update_fw 1
+
 on post-fs
     mkdir /persist/camera 0755 mot_tcmd mot_tcmd
-    mkdir /persist/camera/ledcal 0755 camera mot_tcmd
+    mkdir /persist/camera/focus 0775 camera mot_tcmd
+    mkdir /persist/camera/ledcal 0775 camera mot_tcmd
     mkdir /persist/factory 0755 mot_tcmd mot_tcmd
+    mkdir /persist/factory/audio 0755 mot_tcmd system
     mkdir /persist/public 0755 mot_tcmd mot_tcmd
     mkdir /persist/public/atvc 0770 mot_atvc shell
     mkdir /persist/public/battd 0755 mot_accy mot_tcmd
-    mkdir /persist/public/hiddenmenu 0755 radio radio
+    mkdir /persist/public/hiddenmenu 0775 system mot_tcmd
     mkdir /persist/public/hiddenmenu/data 0775 system mot_tcmd
     mkdir /persist/public/locale 0700 system system
     mkdir /persist/public/omadm 0700 radio radio
@@ -293,28 +339,6 @@ on post-fs
     mkdir /persist/security 02770 mot_tpapi mot_tpapi
     mkdir /persist/batt_health 0755 mot_pwric mot_pwric
     mkdir /persist/mdm 0770 radio radio
-
-    chown system mot_tcmd /persist/public/hiddenmenu/life_calls
-    chown system mot_tcmd /persist/public/hiddenmenu/life_timer
-    chown system mot_tcmd /persist/public/hiddenmenu/data/mobile_data_tx
-    chown system mot_tcmd /persist/public/hiddenmenu/data/mobile_data_rx
-    chown system mot_tcmd /persist/public/hiddenmenu/data/wifi_data_tx
-    chown system mot_tcmd /persist/public/hiddenmenu/data/wifi_data_rx
-    chown system mot_tcmd /persist/public/hiddenmenu/data/pri_rate_intfc
-    chown system mot_tcmd /persist/public/hiddenmenu/data/refurb_date
-    chown system mot_tcmd /persist/public/hiddenmenu/data/refurb_status
-    chown system mot_tcmd /persist/public/hiddenmenu/data/activation_date
-
-    chmod 0664 /persist/public/hiddenmenu/life_calls
-    chmod 0664 /persist/public/hiddenmenu/life_timer
-    chmod 0664 /persist/public/hiddenmenu/data/mobile_data_tx
-    chmod 0664 /persist/public/hiddenmenu/data/mobile_data_rx
-    chmod 0664 /persist/public/hiddenmenu/data/wifi_data_tx
-    chmod 0664 /persist/public/hiddenmenu/data/wifi_data_rx
-    chmod 0644 /persist/public/hiddenmenu/data/pri_rate_intfc
-    chmod 0644 /persist/public/hiddenmenu/data/refurb_date
-    chmod 0644 /persist/public/hiddenmenu/data/refurb_status
-    chmod 0664 /persist/public/hiddenmenu/data/activation_date
 
     chown mot_tcmd mot_tcmd /persist/factory/fti
     chmod 0660 /persist/factory/fti
@@ -329,11 +353,11 @@ on post-fs
     write /proc/sys/vm/page-cluster 0
     write /proc/sys/vm/swappiness 100
 
-# msm specific files that need to be created on /data
 on post-fs-data
     # Create directory for TZ Apps
     mkdir /data/misc/qsee 0770 system system
 
+    # we will remap this as /mnt/sdcard with the sdcard fuse tool
     mkdir /data/misc/camera 0770 camera camera
 
     mkdir /data/misc/ipa 0700 net_admin net_admin
@@ -350,13 +374,12 @@ on post-fs-data
     # Create the directories used by CnE subsystem
     mkdir /data/connectivity 0771 system system
     chown system system /data/connectivity
+    mkdir /data/connectivity/wqeclient 0771 system system
+    chown system system /data/connectivity/wqeclient
 
     # Create the directories used by DPM subsystem
     mkdir /data/dpm 0771 system system
     chown system system /data/dpm
-
-    mkdir /data/dpm/fdMgr 0771 system system
-    chown system system /data/dpm/fdMgr
 
     mkdir /data/dpm/nsrm 0771 system system
     chown system system /data/dpm/nsrm
@@ -366,6 +389,10 @@ on post-fs-data
 
     # Create directory used by the DASH client
     mkdir /data/misc/dash 0770 media audio
+
+    # Create directory used by display clients
+    mkdir /data/misc/display 0770 system graphics
+    mkdir /persist/display 0770 system graphics
 
     # Mounting of persist is moved to 'on emmc-fs' and 'on fs' sections
     # We chown/chmod /persist again so because mount is run as root + defaults
@@ -386,7 +413,7 @@ on post-fs-data
     mkdir /data/system 0775 system system
     #symlink /data/misc/wifi/wpa_supplicant /data/system/wpa_supplicant
 
-    # Create directories for Location services
+    #Create directories for Location services
     mkdir /data/misc/location 0770 gps gps
     mkdir /data/misc/location/mq 0770 gps gps
     mkdir /data/misc/location/xtwifi 0770 gps gps
@@ -394,15 +421,15 @@ on post-fs-data
     mkdir /data/misc/location/quipc 0770 gps system
     mkdir /data/misc/location/gsiff 0770 gps gps
 
-    # Create directory from IMS services
+    #Create directory from IMS services
     mkdir /data/shared 0755
     chown system system /data/shared
 
-    # Create directory for FOTA
+    #Create directory for FOTA
     mkdir /data/fota 0771
     chown system system /data/fota
 
-    # Create directory for hostapd
+    #Create directory for hostapd
     mkdir /data/hostapd 0770 system wifi
 
     # Create /data/time folder for time-services
@@ -412,17 +439,61 @@ on post-fs-data
 
     setprop vold.post_fs_data_done 1
 
-    # Create a folder for SRS to be able to create a usercfg file
+    #Create a folder for SRS to be able to create a usercfg file
     mkdir /data/data/media 0770 media media
 
-    # Create folder for mm-qcamera-daemon
+    #Create folder for mm-qcamera-daemon
     mkdir /data/camera 0770 media camera
+
+    #Create PERFD deamon related dirs
+    mkdir /data/misc/perfd 0755 root system
+    chmod 2755 /data/misc/perfd
+    mkdir /data/system/perfd 0770 root system
+    chmod 2770 /data/system/perfd
+
+    # NFC local data and nfcee xml storage
+    mkdir /data/nfc 0770 nfc nfc
+    mkdir /data/nfc/param 0770 nfc nfc
+
+    # Sensor
+    mkdir /persist/sensors 0775 system system
+    chmod 664 /persist/sensors/sensors_settings
+    chown system root /persist/sensors/sensors_settings
+
+    # RIDL data
+    mkdir /data/misc/SelfHost/ 0710 system shell
+    mkdir /data/misc/SelfHost/QCLogs/ 2750 system shell
+    mkdir /data/misc/SelfHost/QCLogs/temp/ 0700 system shell
+    mkdir /data/misc/SelfHost/storage/ 0700 system shell
+    mkdir /data/misc/SelfHost/Running/ 2750 system shell
+    mkdir /data/misc/SelfHost/socket/ 2770 system system
+
+    #Create FM dir for patchdownloader
+    mkdir /data/misc/fm 0770 system system
+    chmod 0770 /data/misc/fm
+
+    mkdir /data/tombstones 0771 system system
+    mkdir /tombstones/modem 0771 system system
+    mkdir /tombstones/lpass 0771 system system
+    mkdir /tombstones/wcnss 0771 system system
+    mkdir /tombstones/dsps 0771 system system
+    mkdir /persist/data/sfs 0700 system system
+    mkdir /persist/data/tz 0700 system system
+    mkdir /data/misc/dts 0770 media audio
+    mkdir /data/misc/audio_pp 0771 media audio
+
+    # Setup folders for security
+    mkdir /persist/security 02770 mot_tpapi mot_tpapi
+    mkdir /data/local/dbvc 0750 mot_tcmd shell
 
     # Setup folder for native to transfer data to NativeDropBoxAgent
     mkdir /data/system/dropbox-add 0730 system diag
 
     # Create directory for cutback
     mkdir /data/misc/cutback 0770 radio wifi
+
+    # Create directory for fm_radio
+    mkdir /data/misc/fm_radio 0770 system system
 
     #setup folder for WLAN WAPI
     mkdir /data/wapi_certificate 0750 system wifi
@@ -445,8 +516,8 @@ on post-fs-data
     chown mot_pwric mot_pwric /sys/class/power_supply/battery/device/force_chg_fail_clear
     chown mot_pwric mot_pwric /sys/class/power_supply/battery/device/force_chg_usb_otg_ctl
 
-    # Setup correct permissions for dbvc
-    mkdir /data/local/dbvc 0750 mot_tcmd shell
+    # Setup folder for aplogd
+    mkdir /data/aplogd 0750 log log
 
     # Permissions for phone power off log
     mkdir /data/power_log 0750 root log
@@ -456,25 +527,25 @@ on post-fs-data
     # Setup folder for camera HAL subsystem
     mkdir /data/camera_dump 0750 media media
 
+    # SD card encryption metadata
+    mkdir /data/misc/sds 0750 root root
+
+    # Create bug2go folder
+    mkdir /data/bug2go 0750 log log
+
     mkdir /data/hardware_revisions 0755 system system
 
-    mkdir /tombstones/modem 0771 system system
-    mkdir /tombstones/lpass 0771 system system
-    mkdir /tombstones/wcnss 0771 system system
-    mkdir /tombstones/dsps 0771 system system
-    mkdir /persist/data/sfs 0700 system system
-    mkdir /persist/data/tz 0700 system system
+    # Sensor Hub calibration data directory
+    mkdir /data/misc/sensorhub 0770 system compass
 
-    # Force all SSR systems to 'related' so they attempt self-recovery without
-    # rebooting the device
-    write /sys/bus/msm_subsys/devices/subsys0/restart_level related
-    write /sys/bus/msm_subsys/devices/subsys1/restart_level related
-    write /sys/bus/msm_subsys/devices/subsys2/restart_level related
+    # Required by FingerPrint Cards (FPC) via init so we don't need to give qseecomd or fingerprintd permissions to create them
+    mkdir /data/fpc 0700 system system
+    mkdir /data/.fps 0770 system fingerp
 
-    setprop ro.hw.device ${ro.boot.device}
-    setprop ro.hw.hwrev ${ro.boot.hwrev}
-    setprop ro.hw.radio ${ro.boot.radio}
+    # Imager tuning data for camera subsystem
+    mkdir /data/misc/imager 0770 camera camera
 
+	# Services Start here
 service batt_health /system/bin/batt_health
     class late_start
     user mot_pwric
@@ -626,6 +697,11 @@ service irsc_util /system/bin/irsc_util "/etc/sec_config"
     user root
     oneshot
 
+service fingerprintd /system/bin/fingerprintd
+    class late_start
+    user system
+    group system input
+
 service rmt_storage /system/bin/rmt_storage
     class core
     user root
@@ -654,7 +730,7 @@ service config_bt_addr /system/bin/btnvtool -O
     group bluetooth radio
     oneshot
 
-service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
+service hciattach /system/bin/sh /init.qcom.bt.sh
     class late_start
     user bluetooth
     group bluetooth net_bt_admin
@@ -785,7 +861,7 @@ service ril-daemon2 /system/bin/rild -c 2
     disabled
     group radio cache inet misc audio sdcard_rw sensors qcom_diag log net_raw diag
 
-service rild2-wrapper /system/bin/sh /system/etc/init.qcom.ril.sh
+service rild2-wrapper /system/bin/sh /init.qcom.ril.sh
     class late_start
     user root
     group root
