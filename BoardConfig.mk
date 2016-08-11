@@ -15,7 +15,7 @@
 
 -include vendor/motorola/athene/BoardConfigVendor.mk
 
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH := device/motorola/athene
 
 BOARD_VENDOR := motorola-qcom
 
@@ -89,8 +89,8 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 27258650624 # 26619776 * 1024 mmcblk0p48
 TARGET_QCOM_NO_FM_FIRMWARE := true
 
 # Init
-TARGET_INIT_VENDOR_LIB := libinit_msm8952
-TARGET_RECOVERY_DEVICE_MODULES := libinit_msm8952
+TARGET_INIT_VENDOR_LIB := libinit_athene
+TARGET_RECOVERY_DEVICE_MODULES := libinit_athene
 TARGET_UNIFIED_DEVICE := true
 
 # Lights
@@ -101,9 +101,6 @@ BOARD_FLASH_BLOCK_SIZE := 131072
 
 # Power
 TARGET_POWERHAL_VARIANT := qcom
-
-# Properties
-TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
 
 # Qualcomm support
 BOARD_USES_QCOM_HARDWARE := true
