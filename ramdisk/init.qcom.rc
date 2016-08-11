@@ -45,8 +45,8 @@ on early-init
 
     # Subsytem Restart
     #lpass
-    write /sys/bus/msm_subsys/devices/subsys1/restart_level "related"
-    write /sys/bus/msm_subsys/devices/subsys1/recovery_policy "skip_restart"
+    #write /sys/bus/msm_subsys/devices/subsys1/restart_level "related"
+    #write /sys/bus/msm_subsys/devices/subsys1/recovery_policy "skip_restart"
 
 on init
     start qfintverify
@@ -311,6 +311,16 @@ on boot
     chown system drmrpc /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch_enable
     chown system drmrpc /sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/secure_touch
     write /proc/sys/kernel/sched_boost 1
+
+    # Subsytem Restart
+    #venus
+    write /sys/bus/msm_subsys/devices/subsys0/restart_level "related"
+    #adsp
+    write /sys/bus/msm_subsys/devices/subsys1/restart_level "related"
+    #modem
+    write /sys/bus/msm_subsys/devices/subsys2/restart_level "related"
+    #wlan
+    write /sys/bus/msm_subsys/devices/subsys3/restart_level "related"
 
 on fs
     wait /dev/block/bootdevice
