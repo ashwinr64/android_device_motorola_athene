@@ -1,4 +1,4 @@
-# system.prop for msm8952-common
+# system.prop for athene
 
 # Android Run Time
 ro.sys.fw.dex2oat_thread_count=4
