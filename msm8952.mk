@@ -104,6 +104,11 @@ PRODUCT_PACKAGES += \
     FMRadio \
     libfmjni
 
+# IPACM
+PRODUCT_PACKAGES += \
+    IPACM_cfg.xml \
+    ipacm
+
 # IRQ
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/msm_irqbalance.conf:system/vendor/etc/msm_irqbalance.conf

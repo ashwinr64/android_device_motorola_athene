@@ -1,3 +1,4 @@
++
 # ADSP
 bin/adsprpcd
 vendor/lib/libadsprpc.so
@@ -675,6 +676,9 @@ vendor/lib/libscale.so
 # Graphics firmware
 etc/firmware/a420_pfp.fw
 etc/firmware/a420_pm4.fw
+
+# IPA
+bin/ipacm-diag
 
 # Keymaster
 vendor/lib/hw/keystore.msm8952.so
