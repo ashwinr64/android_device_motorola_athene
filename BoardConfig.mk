@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-VENDOR_PATH := device/motorola/msm8952-common
+LOCAL_PATH := device/motorola/athene
 
 BOARD_VENDOR := motorola-qcom
 
-TARGET_SPECIFIC_HEADER_PATH := $(VENDOR_PATH)/include
+TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8952
@@ -51,6 +51,9 @@ TARGET_KERNEL_ARCH := arm
 TARGET_KERNEL_CONFIG := cm_athene_defconfig
 TARGET_KERNEL_SOURCE := kernel/motorola/msm8952
 
+# Asserts
+TARGET_OTA_ASSERT_DEVICE := athene,xt1626,xt1640,xt1641
+
 # Audio
 AUDIO_FEATURE_ENABLED_KPI_OPTIMIZE := true
 AUDIO_FEATURE_ENABLED_NEW_SAMPLE_RATE := true
@@ -62,7 +65,7 @@ BOARD_PROVIDES_RILD := true
 BOARD_PROVIDES_LIBRIL := true
 
 # Bluetooth
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(VENDOR_PATH)/bluetooth
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BLUETOOTH_HCI_USE_MCT := true
@@ -73,7 +76,7 @@ USE_DEVICE_SPECIFIC_CAMERA := true
 # CMHW
 BOARD_USES_CYANOGEN_HARDWARE := true
 BOARD_HARDWARE_CLASS += \
-    $(VENDOR_PATH)/cmhw \
+    $(LOCAL_PATH)/cmhw \
     hardware/cyanogen/cmhw
 
 # Display
@@ -102,8 +105,8 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 27258650624 # 26619776 * 1024 mmcblk0p48
 TARGET_QCOM_NO_FM_FIRMWARE := true
 
 # Init
-TARGET_INIT_VENDOR_LIB := libinit_msm8952
-TARGET_RECOVERY_DEVICE_MODULES := libinit_msm8952
+TARGET_INIT_VENDOR_LIB := libinit_athene
+TARGET_RECOVERY_DEVICE_MODULES := libinit_athene
 TARGET_UNIFIED_DEVICE := true
 
 # GPS
@@ -142,13 +145,13 @@ USE_SENSOR_MULTI_HAL := true
 
 # Recovery
 BOARD_HAS_NO_SELECT_BUTTON := true
-TARGET_RECOVERY_FSTAB := $(VENDOR_PATH)/ramdisk/fstab.qcom
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/ramdisk/fstab.qcom
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk
-BOARD_SEPOLICY_DIRS += $(VENDOR_PATH)/sepolicy
+BOARD_SEPOLICY_DIRS += $(LOCAL_PATH)/sepolicy
 
 # Wifi
 BOARD_HAS_QCOM_WLAN := true
