@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2016 The CyanogenMod Project
+# Copyright (C) 2011 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ifneq ($(filter athene, $(TARGET_DEVICE)),)
+# Inherit from athene device
+$(call inherit-product, device/motorola/athene/device.mk)
 
-LOCAL_PATH := $(call my-dir)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
-
-endif
+# Set those variables here to overwrite the inherited values.
+PRODUCT_NAME := full_athene
+PRODUCT_DEVICE := athene
+PRODUCT_BRAND := motorola
+PRODUCT_MANUFACTURER := motorola
+PRODUCT_MODEL := Moto G4
