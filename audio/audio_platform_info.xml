@@ -27,20 +27,13 @@
 <audio_platform_info>
     <acdb_ids>
 	<!-- Output devices -->
-	<device name="SND_DEVICE_OUT_VOICE_HANDSET" acdb_id="7"/>
-	<device name="SND_DEVICE_OUT_VOICE_HANDSET_TMUS" acdb_id="7"/>
 	<device name="SND_DEVICE_OUT_HEADPHONES" acdb_id="9"/>
 	<device name="SND_DEVICE_OUT_SPEAKER_AND_HEADPHONES" acdb_id="9"/>
-	<device name="SND_DEVICE_OUT_SPEAKER_SAFE_AND_HEADPHONES" acdb_id="9"/>
-	<device name="SND_DEVICE_OUT_SPEAKER" acdb_id="14"/>
 	<device name="SND_DEVICE_OUT_SPEAKER_PROTECTED" acdb_id="14"/>
 	<device name="SND_DEVICE_OUT_SPEAKER_REVERSE" acdb_id="14"/>
-	<device name="SND_DEVICE_OUT_SPEAKER_SAFE" acdb_id="14"/>
 	<device name="SND_DEVICE_OUT_VOICE_SPEAKER_PROTECTED" acdb_id="15"/>
 	<device name="SND_DEVICE_OUT_SPEAKER_AND_HDMI" acdb_id="18"/>
 	<device name="SND_DEVICE_OUT_VOICE_LINE" acdb_id="78"/>
-	<device name="SND_DEVICE_OUT_VOLTE_NB_ANC_HANDSET" acdb_id="200"/>
-	<device name="SND_DEVICE_OUT_VOLTE_NB_HANDSET_TMUS" acdb_id="200"/>
 
 	<!-- Input devices -->
 	<device name="SND_DEVICE_IN_CAPTURE_VI_FEEDBACK" acdb_id="0"/>
@@ -49,11 +42,9 @@
 	<device name="SND_DEVICE_IN_HANDSET_MIC_NS" acdb_id="4"/>
 	<device name="SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC" acdb_id="4"/>
 	<device name="SND_DEVICE_IN_VOICE_REC_DMIC_FLUENCE" acdb_id="35"/>
-	<device name="SND_DEVICE_IN_VOICE_DMIC_TMUS" acdb_id="41"/>
 	<device name="SND_DEVICE_IN_SPEAKER_DMIC_AEC" acdb_id="43"/>
 	<device name="SND_DEVICE_IN_SPEAKER_DMIC_AEC_NS" acdb_id="43"/>
 	<device name="SND_DEVICE_IN_SPEAKER_DMIC_NS" acdb_id="43"/>
-	<device name="SND_DEVICE_IN_HEADSET_MIC_AEC" acdb_id="47"/>
 	<device name="SND_DEVICE_IN_VOICE_REC_MIC_NS" acdb_id="62"/>
 	<device name="SND_DEVICE_IN_HANDSET_DMIC_AEC" acdb_id="111"/>
 	<device name="SND_DEVICE_IN_HANDSET_DMIC_NS" acdb_id="111"/>
@@ -70,7 +61,7 @@
 
     <device_names>
         <device name="SND_DEVICE_IN_CAMCORDER_STEREO_DMIC" alias="camcorder-mic-bf" />
-        <device name="SND_DEVICE_IN_VOICE_REC_DMIC_STEREO" alias="camcorder-mic-bf" />
+        <device name="SND_DEVICE_IN_VOICE_REC_DMIC_STEREO" alias="dmic-endfire" />
     </device_names>
 </audio_platform_info>
 
