@@ -88,7 +88,18 @@ void vendor_load_properties()
     property_set("persist.radio.force_get_pref", "1");
     property_set("ro.telephony.default_network", "10,0");
 
-    if (ISMATCH(sku, "XT1622")) {
+    if (atoi(numsims) >= 2)
+        force_msim = true;
+
+    if (!force_msim && ISMATCH(sku, "XT1622")) {
+        /* XT1622 */
+        target_2gb();
+        ssim();
+        property_set("ro.product.device", "athene");
+        property_set("ro.build.description", "athene-user 6.0.1 MPJ24.139-23.4 4 release-keys");
+        property_set("ro.build.fingerprint", "motorola/athene/athene:6.0.1/MPJ24.139-23.4/4:user/release-keys");
+        property_set("ro.hw.fps", "false");
+    } else if (force_msim && ISMATCH(sku, "XT1622")) {
         /* XT1622 */
         target_2gb();
         msim();
