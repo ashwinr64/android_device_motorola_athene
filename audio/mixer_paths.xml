@@ -47,6 +47,8 @@
 	<ctl name="AMP Gain" value="3dB" />
 	<ctl name="OSPL Ext RxConfig" value="NONE" />
 	<ctl name="OSPL Ext TxConfig" value="NONE" />
+	<ctl name="OSPL Int RxConfig" value="NONE" />
+	<ctl name="OSPL Int TxConfig" value="NONE" />
 	<ctl name="OSPL Rx" value="Enable" />
 	<ctl name="OSPL Tx" value="Enable" />
 	<ctl name="TX1 HPF Switch" value="1" />
@@ -337,7 +339,6 @@
 		<path name="voice-call cirrus" />
 	</path>
 
-
 	<path name="voice-call bt-sco">
 		<ctl name="INTERNAL_BT_SCO_RX_Voice Mixer VoiceMMode1" value="1" />
 		<ctl name="VoiceMMode1_Tx Mixer INT_BT_SCO_TX_MMode1" value="1" />
@@ -434,17 +435,10 @@
 		<ctl name="RDAC2 MUX" value="RX2" />
 		<ctl name="HPHL" value="Switch" />
 		<ctl name="HPHR" value="Switch" />
-		<ctl name="RX1 Digital Volume" value="83" />
-		<ctl name="RX2 Digital Volume" value="83" />
 	</path>
 
 	<path name="line">
-		<ctl name="MI2S_RX Channels" value="Two" />
-		<ctl name="RX1 MIX1 INP1" value="RX1" />
-		<ctl name="RX2 MIX1 INP1" value="RX2" />
-		<ctl name="RDAC2 MUX" value="RX2" />
-		<ctl name="HPHL" value="Switch" />
-		<ctl name="HPHR" value="Switch" />
+		<path name="headphones" />
 	</path>
 
 	<path name="headset-mic">
