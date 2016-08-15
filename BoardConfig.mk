@@ -46,7 +46,7 @@ TARGET_KERNEL_CONFIG := cm_athene_defconfig
 TARGET_KERNEL_SOURCE := kernel/motorola/msm8952
 
 # Asserts
-TARGET_OTA_ASSERT_DEVICE := athene,xt1626,xt1640,xt1641
+TARGET_OTA_ASSERT_DEVICE := athene,xt1622,xt1626,xt1640,xt1641
 
 # Audio
 AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true
