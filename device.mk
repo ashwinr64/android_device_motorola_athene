@@ -61,6 +61,7 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 
 # Audio
 PRODUCT_PACKAGES += \
+    audiod \
     libaudio-resampler \
     libqcomvisualizer \
     libqcomvoiceprocessing \
