@@ -116,7 +116,6 @@ void vendor_load_properties()
     char device[PROP_VALUE_MAX];
     char sku[PROP_VALUE_MAX];
     char carrier[PROP_VALUE_MAX];
-    char device[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
     int rc;
 
@@ -152,8 +151,6 @@ void vendor_load_properties()
         property_set("ro.build.fingerprint", "motorola/athene_f/athene_f:6.0.1/MPJ24.139-23.4/4:user/release-keys");
         property_set("ro.hw.fps", "true");
     }
-}
-
     property_get("ro.product.device", device);
     strlcpy(devicename, device, sizeof(devicename));
     INFO("Found sku id: %s setting build properties for %s device\n", sku, devicename);
