@@ -55,10 +55,12 @@ void target_3gb() {
 
 void msim() {
         property_set("persist.radio.multisim.config", "dsds");
+        property_set("persist.radio.plmn_name_cmp", "1");
 }
 
 void ssim() {
         property_set("persist.radio.multisim.config", "");
+        property_set("persist.radio.plmn_name_cmp", "");
 }
 
 void vendor_load_properties()
@@ -70,6 +72,7 @@ void vendor_load_properties()
     char device[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
     int rc;
+    bool force_msim = false;
 
     rc = property_get("ro.board.platform", platform);
     if (!rc || !ISMATCH(platform, ANDROID_TARGET))
@@ -78,6 +81,7 @@ void vendor_load_properties()
     property_get("ro.boot.radio", radio);
     property_get("ro.boot.hardware.sku", sku);
     property_get("ro.boot.carrier", carrier);
+    force_msim = property_get_bool("ro.boot.dualsim", "false");
 
     /* Common for all models */
     property_set("ro.build.product", "athene");
@@ -85,11 +89,9 @@ void vendor_load_properties()
     property_set("ro.mot.build.customerid", "retail");
     property_set("persist.radio.mot_ecc_custid", "common");
     property_set("persist.radio.mot_ecc_enabled", "1");
-    property_set("persist.radio.force_get_pref", "1");
     property_set("ro.telephony.default_network", "10,0");
-
-    if (atoi(numsims) >= 2)
-        force_msim = true;
+    property_set("persist.radio.force_get_pref", "1");
+    property_set("ro.telephony.ril.config", "simactivation");
 
     if (!force_msim && ISMATCH(sku, "XT1622")) {
         /* XT1622 */
