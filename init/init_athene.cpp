@@ -35,7 +35,7 @@
 #define ISMATCH(a,b)    (!strncmp(a,b,PROP_VALUE_MAX))
 
 /* Target-Specific Dalvik Heap Configuration */
-void target_2gb() {
+void low_mem() {
         property_set("dalvik.vm.heapstartsize", "8m");
         property_set("dalvik.vm.heapgrowthlimit", "192m");
         property_set("dalvik.vm.heapsize", "512m");
@@ -44,7 +44,7 @@ void target_2gb() {
         property_set("dalvik.vm.heapmaxfree", "8m");
 }
 
-void target_3gb() {
+void high_mem() {
         property_set("dalvik.vm.heapstartsize", "8m");
         property_set("dalvik.vm.heapgrowthlimit", "96m");
         property_set("dalvik.vm.heapsize", "256m");
@@ -53,12 +53,12 @@ void target_3gb() {
         property_set("dalvik.vm.heapmaxfree", "8m");
 }
 
-void msim() {
+void dualsim() {
         property_set("persist.radio.multisim.config", "dsds");
         property_set("persist.radio.plmn_name_cmp", "1");
 }
 
-void ssim() {
+void singlesim() {
         property_set("persist.radio.multisim.config", "");
         property_set("persist.radio.plmn_name_cmp", "");
 }
@@ -72,7 +72,6 @@ void vendor_load_properties()
     char device[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
     int rc;
-    bool force_msim = false;
 
     rc = property_get("ro.board.platform", platform);
     if (!rc || !ISMATCH(platform, ANDROID_TARGET))
@@ -81,7 +80,6 @@ void vendor_load_properties()
     property_get("ro.boot.radio", radio);
     property_get("ro.boot.hardware.sku", sku);
     property_get("ro.boot.carrier", carrier);
-    force_msim = property_get_bool("ro.boot.dualsim", "false");
 
     /* Common for all models */
     property_set("ro.build.product", "athene");
@@ -90,50 +88,39 @@ void vendor_load_properties()
     property_set("persist.radio.mot_ecc_custid", "common");
     property_set("persist.radio.mot_ecc_enabled", "1");
     property_set("ro.telephony.default_network", "10,0");
+
+/*
+    Motorola offers single and dual sim in al lot of model numbers
+    Moved single/dusl sim selection outside model list
+ */
+
     property_set("persist.radio.force_get_pref", "1");
     property_set("ro.telephony.ril.config", "simactivation");
 
-    if (!force_msim && ISMATCH(sku, "XT1622")) {
-        /* XT1622 */
-        target_2gb();
-        ssim();
+    if ( property_get_bool("ro.boot.dualsim", "false") ) {
+       dualsim ();
+    } else {
+       singlesim ();
+    }
+
+    if ( property_get_int32("ro.sys.fw.trim_enable_memory", 2147483648 ) <= 2147483648 ) {
+       low_mem ();
+    } else {
+       high_mem ();
+
+    if (ISMATCH(sku, "XT1620") || ISMATCH(sku, "XT1621") || ISMATCH(sku, "XT1622") || ISMATCH(sku, "XT1624") || ISMATCH(sku, "XT1625")  || ISMATCH(sku, "XT1626")   ) {
+        /* XT162x  Moto G4 */
         property_set("ro.product.device", "athene");
         property_set("ro.build.description", "athene-user 6.0.1 MPJ24.139-23.4 4 release-keys");
         property_set("ro.build.fingerprint", "motorola/athene/athene:6.0.1/MPJ24.139-23.4/4:user/release-keys");
         property_set("ro.hw.fps", "false");
-    } else if (force_msim && ISMATCH(sku, "XT1622")) {
-        /* XT1622 */
-        target_2gb();
-        msim();
-        property_set("ro.product.device", "athene");
-        property_set("ro.build.description", "athene-user 6.0.1 MPJ24.139-23.4 4 release-keys");
-        property_set("ro.build.fingerprint", "motorola/athene/athene:6.0.1/MPJ24.139-23.4/4:user/release-keys");
-        property_set("ro.hw.fps", "false");
-    } else if (ISMATCH(sku, "XT1625")) {
-        /* XT1625 */
-        target_2gb();
-        ssim();
-        property_set("ro.product.device", "athene");
-        property_set("ro.build.description", "athene-user 6.0.1 MPJ24.139-48 48 release-keys");
-        property_set("ro.build.fingerprint", "motorola/athene/athene:6.0.1/MPJ24.139-48/48:user/release-keys");
-        property_set("ro.hw.fps", "false");
-    } else if (ISMATCH(sku, "XT1642")) {
-        /* XT1642 */
-        target_2gb();
-        msim();
+    } else {
+        /* XT164x Moto G4+ */
         property_set("ro.product.device", "athene_f");
         property_set("ro.build.description", "athene_f-user 6.0.1 MPJ24.139-23.4 4 release-keys");
         property_set("ro.build.fingerprint", "motorola/athene_f/athene_f:6.0.1/MPJ24.139-23.4/4:user/release-keys");
         property_set("ro.hw.fps", "true");
-    } else if (ISMATCH(sku, "XT1643")) {
-        /* XT1643 */
-        target_3gb();
-        msim();
-        property_set("ro.product.device", "athene_f");
-        property_set("ro.build.description", "athene_f-user 6.0.1 MPJ24.139-23.1 1 release-keys");
-        property_set("ro.build.fingerprint", "motorola/athene_f/athene_f:6.0.1/MPJ24.139-23.1/1:user/release-keys");
-        property_set("ro.hw.fps", "true");
-}
+    }
 
     property_get("ro.product.device", device);
     strlcpy(devicename, device, sizeof(devicename));
