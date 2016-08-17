@@ -22,6 +22,8 @@ lib/hw/audio.r_submix.default.so
 lib/hw/audio.usb.default.so
 lib/hw/audio_policy.default.so
 lib/libmotaudioutils.so
+lib/libstagefright_soft_aacdec.so
+lib/libstagefright_soft_aacenc.so
 lib/soundfx/libaudiopreprocessing.so
 lib/soundfx/libbundlewrapper.so
 lib/soundfx/libdownmix.so
