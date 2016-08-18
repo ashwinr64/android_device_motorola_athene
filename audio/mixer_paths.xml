@@ -326,13 +326,13 @@
 	</path>
 
 	<path name="voice-call">
-		<ctl name="PRI_MI2S_RX_Voice Mixer VoiceMMode1" value="1" />
-		<ctl name="VoiceMMode1_Tx Mixer TERT_MI2S_TX_MMode1" value="1" />
+		<ctl name="PRI_MI2S_RX_Voice Mixer CSVoice" value="1" />
+		<ctl name="Voice_Tx Mixer TERT_MI2S_TX_Voice" value="1" />
 	</path>
 
 	<path name="voice-call cirrus">
-		<ctl name="QUIN_MI2S_RX_Voice Mixer VoiceMMode1" value="1" />
-		<ctl name="VoiceMMode1_Tx Mixer TERT_MI2S_TX_MMode1" value="1" />
+		<ctl name="QUIN_MI2S_RX_Voice Mixer CSVoice" value="1" />
+		<ctl name="Voice_Tx Mixer TERT_MI2S_TX_Voice" value="1" />
 	</path>
 
 	<path name="voice-call speaker">
@@ -340,8 +340,8 @@
 	</path>
 
 	<path name="voice-call bt-sco">
-		<ctl name="INTERNAL_BT_SCO_RX_Voice Mixer VoiceMMode1" value="1" />
-		<ctl name="VoiceMMode1_Tx Mixer INT_BT_SCO_TX_MMode1" value="1" />
+		<ctl name="INTERNAL_BT_SCO_RX_Voice Mixer CSVoice" value="1" />
+		<ctl name="Voice_Tx Mixer INTERNAL_BT_SCO_TX_Voice" value="1" />
 	</path>
 
 	<path name="voice-call bt-sco-wb">
@@ -350,18 +350,18 @@
 	</path>
 
 	<path name="voice-call afe-proxy">
-		<ctl name="AFE_PCM_RX_Voice Mixer VoiceMMode1" value="1" />
-		<ctl name="VoiceMMode1_Tx Mixer AFE_PCM_TX_MMode1" value="1" />
+		<ctl name="AFE_PCM_RX_Voice Mixer CSVoice" value="1" />
+		<ctl name="Voice_Tx Mixer AFE_PCM_TX_Voice" value="1" />
 	</path>
 
 	<path name="voice2-call">
-		<ctl name="PRI_MI2S_RX_Voice Mixer VoiceMMode2" value="1" />
-		<ctl name="VoiceMMode2_Tx Mixer TERT_MI2S_TX_MMode2" value="1" />
+		<ctl name="PRI_MI2S_RX_Voice Mixer Voice2" value="1" />
+		<ctl name="Voice2_Tx Mixer TERT_MI2S_TX_Voice2" value="1" />
 	</path>
 
 	<path name="voice2-call cirrus">
-		<ctl name="QUIN_MI2S_RX_Voice Mixer VoiceMMode2" value="1" />
-		<ctl name="VoiceMMode2_Tx Mixer TERT_MI2S_TX_MMode2" value="1" />
+		<ctl name="QUIN_MI2S_RX_Voice Mixer Voice2" value="1" />
+		<ctl name="Voice2_Tx Mixer TERT_MI2S_TX_Voice2" value="1" />
 	</path>
 
 	<path name="voice2-call speaker">
@@ -369,8 +369,8 @@
 	</path>
 
 	<path name="voice2-call bt-sco">
-		<ctl name="INTERNAL_BT_SCO_RX_Voice Mixer VoiceMMode2" value="1" />
-		<ctl name="VoiceMMode2_Tx Mixer INT_BT_SCO_TX_MMode2" value="1" />
+		<ctl name="INTERNAL_BT_SCO_RX_Voice Mixer Voice2" value="1" />
+		<ctl name="Voice2_Tx Mixer INTERNAL_BT_SCO_TX_Voice2" value="1" />
 	</path>
 
 	<path name="voice2-call bt-sco-wb">
@@ -379,8 +379,8 @@
 	</path>
 
 	<path name="voice2-call afe-proxy">
-		<ctl name="AFE_PCM_RX_Voice Mixer VoiceMMode2" value="1" />
-		<ctl name="VoiceMMode2_Tx Mixer AFE_PCM_TX_MMode2" value="1" />
+		<ctl name="AFE_PCM_RX_Voice Mixer Voice2" value="1" />
+		<ctl name="Voice2_Tx Mixer AFE_PCM_TX_Voice2" value="1" />
 	</path>
 
 	<path name="afe-proxy-playback afe-proxy">
