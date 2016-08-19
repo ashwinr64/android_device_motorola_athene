@@ -142,6 +142,9 @@ PRODUCT_PACKAGES += \
     lights.msm8952
 
 # GPS
+PRODUCT_PACKAGES += \
+     gps.msm8952
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/izat.conf:system/etc/izat.conf
 
