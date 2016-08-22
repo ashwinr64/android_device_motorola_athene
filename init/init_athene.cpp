@@ -102,6 +102,7 @@ void target_ram() {
 void num_sims() {
     char dualsim[PROP_VALUE_MAX];
     property_get("ro.boot.dualsim", dualsim);
+    property_set("ro.hw.dualsim", dualsim);
 
     if (ISMATCH(dualsim, "true")) {
         property_set("persist.radio.multisim.config", "dsds");
@@ -112,12 +113,12 @@ void num_sims() {
 
 void vendor_load_properties()
 {
-    char platform[PROP_VALUE_MAX];
-    char device_boot[PROP_VALUE_MAX];
-    char sku[PROP_VALUE_MAX];
-    char carrier[PROP_VALUE_MAX];
     char device[PROP_VALUE_MAX];
+    char device_boot[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
+    char platform[PROP_VALUE_MAX];
+    char radio[PROP_VALUE_MAX];
+    char sku[PROP_VALUE_MAX];
     int rc;
 
     rc = property_get("ro.board.platform", platform);
@@ -125,8 +126,8 @@ void vendor_load_properties()
     return;
 
     property_get("ro.boot.device", device_boot);
+    property_get("ro.boot.radio", radio);
     property_get("ro.boot.hardware.sku", sku);
-    property_get("ro.boot.carrier", carrier);
 
     /* Common for all models */
     property_set("ro.build.product", "athene");
@@ -136,6 +137,8 @@ void vendor_load_properties()
     property_set("persist.radio.mot_ecc_enabled", "1");
     property_set("persist.radio.force_get_pref", "1");
     property_set("ro.telephony.default_network", "10,0");
+    property_set("ro.hw.device", device_boot);
+    property_set("ro.hw.radio", radio);
     target_ram();
     num_sims();
 
