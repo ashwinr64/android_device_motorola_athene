@@ -4,17 +4,17 @@
 #rild.libpath=/system/lib/libreference-ril.so
 rild.libpath=/system/vendor/lib/libril-qc-qmi-1.so
 rild.libargs=-d /dev/smd0
-persist.rild.nitz_plmn=
-persist.rild.nitz_long_ons_0=
-persist.rild.nitz_long_ons_1=
-persist.rild.nitz_long_ons_2=
-persist.rild.nitz_long_ons_3=
-persist.rild.nitz_short_ons_0=
-persist.rild.nitz_short_ons_1=
-persist.rild.nitz_short_ons_2=
-persist.rild.nitz_short_ons_3=
+#persist.rild.nitz_plmn=
+#persist.rild.nitz_long_ons_0=
+#persist.rild.nitz_long_ons_1=
+#persist.rild.nitz_long_ons_2=
+#persist.rild.nitz_long_ons_3=
+#persist.rild.nitz_short_ons_0=
+#persist.rild.nitz_short_ons_1=
+#persist.rild.nitz_short_ons_2=
+#persist.rild.nitz_short_ons_3=
 #ril.subscription.types=NV,RUIM
-DEVICE_PROVISIONED=1
+#DEVICE_PROVISIONED=1
 # MOTCHANGE - configured later in product make files
 #ro.telephony.default_network=5
 
@@ -275,7 +275,6 @@ persist.qcril_uim_vcc_feature=1
 persist.data.qmi.adb_logmask=0
 persist.radio.0x9e_not_callname=1
 persist.radio.mt_sms_ack=30
-persist.radio.force_get_pref=1
 persist.dpm.feature=0
 persist.radio.sar_sensor=1
 ro.usb.mtp=2e82

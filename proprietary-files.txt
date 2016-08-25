@@ -782,7 +782,6 @@ vendor/lib/libsmemlog.so
 bin/netmgrd
 bin/qmuxd
 bin/radish
-bin/rild
 bin/rmt_storage
 etc/data/dsi_config.xml
 etc/data/netmgr_config.xml
@@ -792,7 +791,6 @@ etc/permissions/qcnvitems.xml
 etc/permissions/qcrilhook.xml
 lib/libadropbox.so
 lib/libmdmcutback.so
-lib/libril.so
 vendor/bin/qti
 vendor/lib/libSubSystemShutdown.so
 vendor/lib/libcneapiclient.so

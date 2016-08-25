@@ -164,7 +164,16 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libcnefeatureconfig \
     librmnetctl \
-    libxml2
+    libril \
+    libxml2 \
+    qcrilmsgtunnel \
+    qcnvitems \
+    qcrilhook \
+    rild
+
+# Time services
+PRODUCT_PACKAGES += \
+    TimeService
 
 # Sensors
 PRODUCT_COPY_FILES += \
