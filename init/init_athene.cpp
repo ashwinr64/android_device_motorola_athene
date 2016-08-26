@@ -71,7 +71,7 @@ void vendor_load_properties()
     char carrier[PROP_VALUE_MAX];
     char device[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
-    char avail_mem[PROP_VALUE_MAX];
+    char boot_ram[PROP_VALUE_MAX];
     char multisim[PROP_VALUE_MAX];
     char device_boot[PROP_VALUE_MAX];
     int rc;
@@ -111,8 +111,8 @@ void vendor_load_properties()
        singlesim ();
     }
 
-    property_get("ro.sys.fw.trim_enable_memory",avail_mem);
-    if ( ISMATCH(avail_mem,"2147483648")) {
+    property_get("ro.boot.ram",boot_ram);
+    if ( ISMATCH(boot_ram,"2GB")) {
        low_mem ();
     } else {
        high_mem ();
