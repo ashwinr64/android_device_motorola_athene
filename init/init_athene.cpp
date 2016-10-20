@@ -32,14 +32,11 @@
 #include "log.h"
 #include "util.h"
 
-#define ISMATCH(a,b)    (!strncmp(a,b,PROP_VALUE_MAX))
-
 /* Target-Specific Dalvik Heap & HWUI Configuration */
 void target_ram() {
-    char ram[PROP_VALUE_MAX];
-    property_get("ro.boot.ram", ram);
+    std::string ram = property_get("ro.boot.ram");
 
-    if (ISMATCH(ram, "2GB")) {
+    if (ram == "2GB") {
         property_set("dalvik.vm.heapstartsize", "16m");
         property_set("dalvik.vm.heapgrowthlimit", "192m");
         property_set("dalvik.vm.heapsize", "512m");
@@ -81,11 +78,10 @@ void target_ram() {
 }
 
 void num_sims() {
-    char dualsim[PROP_VALUE_MAX];
-    property_get("ro.boot.dualsim", dualsim);
+    std::string dualsim = property_get("ro.boot.dualsim");
     property_set("ro.hw.dualsim", dualsim);
 
-    if (ISMATCH(dualsim, "true")) {
+    if (dualsim == "true") {
             property_set("persist.radio.multisim.config", "dsds");
 	} else {
             property_set("persist.radio.multisim.config", "");
@@ -94,26 +90,19 @@ void num_sims() {
 
 void vendor_load_properties()
 {
-    char platform[PROP_VALUE_MAX];
-    char device_boot[PROP_VALUE_MAX];
-    char sku[PROP_VALUE_MAX];
-    char carrier[PROP_VALUE_MAX];
-    char device[PROP_VALUE_MAX];
-    char devicename[PROP_VALUE_MAX];
-    char radio[PROP_VALUE_MAX];
-    int rc;
+    std::string platform, device_boot, sku, radio, device;
 
-    rc = property_get("ro.board.platform", platform);
-    if (!rc || !ISMATCH(platform, ANDROID_TARGET))
+ 	platform = property_get("ro.board.platform");
+    if (platform == ANDROID_TARGET)
         return;
 
-    property_get("ro.boot.device", device_boot);
+    device_boot = property_get("ro.boot.device");
     property_set("ro.hw.device", device_boot);
-	
-    property_get("ro.boot.hardware.sku", sku);
-    property_get("ro.boot.carrier", carrier);
-	
-    property_get("ro.boot.radio", radio);
+
+    sku = property_get("ro.boot.hardware.sku");
+    carrier = property_get("ro.boot.carrier");
+
+    radio = property_get("ro.boot.radio");
     property_set("ro.hw.radio", radio);
 	
     /* Common for all models */
@@ -121,7 +110,7 @@ void vendor_load_properties()
     target_ram();
     num_sims();
 
-    if (ISMATCH(device_boot, "athene_13mp")) {
+    if (device_boot == "athene_13mp") {
         /* Moto G4 (XT162x) */
         property_set("ro.product.device", "athene");
         property_set("ro.build.description", "athene-user 6.0.1 MPJ24.139-63 64 release-keys");
@@ -137,14 +126,13 @@ void vendor_load_properties()
         property_set("ro.telephony.default_network", "10,10");
     }
 	
-	if (ISMATCH(sku, "XT1625") || ISMATCH(sku, "XT1644")) {
+	if (sku == "XT1625") || sku == "XT1644") {
 		property_set("persist.radio.is_wps_enabled", "true");
 		property_set("ro.radio.imei.sv", "4");
 	}
 	
-	if (ISMATCH(sku, "XT1621") || ISMATCH(sku, "XT1622") || ISMATCH(sku, "XT1640") || ISMATCH(sku, "XT1642") || ISMATCH(sku, "XT1643")) {
-		
-                if (ISMATCH(radio, "India")) {
+	if (sku == "XT1621" || sku == "XT1622" || sku == "XT1640" || sku == "XT1642" || sku == "XT1643") {
+                if (radio == "India")) {
                     property_set("ro.radio.imei.sv", "6");
                     property_set("persist.radio.is_wps_enabled", "true");
                 }
@@ -153,14 +141,13 @@ void vendor_load_properties()
                 }
 	}
 	
-	if (ISMATCH(sku, "XT1626") || ISMATCH(sku, "XT1641")) {
+	if (sku == "XT1626" || sku == "XT1641") {
 		property_set("ro.radio.imei.sv", "2");
 		property_set("persist.radio.is_wps_enabled", "true");
 		property_set("persist.radio.pb.max.match", "10");
 	}
 	
-    property_get("ro.product.device", device);
-    strlcpy(devicename, device, sizeof(devicename));
-    INFO("Found sku id: %s setting build properties for %s device\n", sku, devicename);
+    device = property_get("ro.product.device");
+    INFO("Found sku id: %s setting build properties for %s device\n", sku.c_str() , device.c_str());
 }
 
