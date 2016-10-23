@@ -13,6 +13,10 @@
 # limitations under the License.
 
 $(call inherit-product, device/motorola/athene/full_athene.mk)
+$(call inherit-product, vendor/motorola/athene/athene-vendor.mk)
+
+# Some Common CM Stuff
+$(call inherit-product-if-exists, vendor/cm/config/common_full_phone.mk)
 
 # Boot animation
 TARGET_SCREEN_WIDTH := 1080
