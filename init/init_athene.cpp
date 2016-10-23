@@ -79,7 +79,7 @@ void target_ram() {
 
 void num_sims() {
     std::string dualsim = property_get("ro.boot.dualsim");
-    property_set("ro.hw.dualsim", dualsim);
+    property_set("ro.hw.dualsim", "dualsim");
 
     if (dualsim == "true") {
             property_set("persist.radio.multisim.config", "dsds");
@@ -90,20 +90,20 @@ void num_sims() {
 
 void vendor_load_properties()
 {
-    std::string platform, device_boot, sku, radio, device;
+    std::string platform, device_boot, sku, radio, device, carrier;
 
  	platform = property_get("ro.board.platform");
     if (platform == ANDROID_TARGET)
         return;
 
     device_boot = property_get("ro.boot.device");
-    property_set("ro.hw.device", device_boot);
+    property_set("ro.hw.device", "device_boot");
 
     sku = property_get("ro.boot.hardware.sku");
     carrier = property_get("ro.boot.carrier");
 
     radio = property_get("ro.boot.radio");
-    property_set("ro.hw.radio", radio);
+    property_set("ro.hw.radio", "radio");
 	
     /* Common for all models */
     property_set("ro.build.product", "athene");
@@ -126,13 +126,12 @@ void vendor_load_properties()
         property_set("ro.telephony.default_network", "10,10");
     }
 	
-	if (sku == "XT1625") || sku == "XT1644") {
+	if (sku == "XT1625" || sku == "XT1644") {
 		property_set("persist.radio.is_wps_enabled", "true");
 		property_set("ro.radio.imei.sv", "4");
-	}
-	
+        }
 	if (sku == "XT1621" || sku == "XT1622" || sku == "XT1640" || sku == "XT1642" || sku == "XT1643") {
-                if (radio == "India")) {
+                if (radio == "India") {
                     property_set("ro.radio.imei.sv", "6");
                     property_set("persist.radio.is_wps_enabled", "true");
                 }

@@ -186,8 +186,19 @@ PRODUCT_PACKAGES += \
     power.msm8952
 
 # Ramdisk
-PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,${LOCAL_PATH}/ramdisk,root)
+# Ramdisk
+PRODUCT_PACKAGES += \
+    fstab.qcom \
+    init.mmi.boot.sh \
+    init.mmi.laser.sh \
+    init.mmi.touch.sh \
+    init.mmi.usb.rc \
+    init.oem.hw.sh \
+    init.qcom.sh.sh \
+    init.qcom.power.rc \
+    init.qcom.rc \
+    init.qcom.ril.sh \
+    ueventd.qcom.rc
 
 # RIL
 PRODUCT_PACKAGES += \
@@ -251,8 +262,4 @@ PRODUCT_COPY_FILES += \
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 
 PRODUCT_GMS_CLIENTID_BASE := android-motorola
-
-$(call inherit-product, vendor/motorola/athene/athene-vendor.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
-$(call inherit-product-if-exists, vendor/cm/config/common_full_phone.mk)
 
